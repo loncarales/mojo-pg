@@ -1,0 +1,5 @@
+requires 'Modern::Perl';
+requires 'Mojolicious', '8.03';
+requires 'Mojo::Pg';
+requires 'SQL::Abstract', '1.86';
+requires 'DBD::Pg', '3.005001';

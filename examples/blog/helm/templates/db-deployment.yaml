@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-{{ include "mojo-blog.fullname" . }}
+  labels:
+    app.kubernetes.io/name: db-{{ include "mojo-blog.name" . }}
+    helm.sh/chart: {{ include "mojo-blog.chart" . }}
+    app.kubernetes.io/instance: db-{{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: db-{{ include "mojo-blog.name" . }}
+      app.kubernetes.io/instance: db-{{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: db-{{ include "mojo-blog.name" . }}
+        app.kubernetes.io/instance: db-{{ .Release.Name }}
+    spec:
+      containers:
+        - name: db
+          image: postgres:9.6.11
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: POSTGRES_DB
+              value: {{ .Values.environmentVars.dbDatabase | quote }}
+            - name: POSTGRES_USER
+              value: {{ .Values.environmentVars.dbUserName | quote }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.environmentVars.dbPassword | quote }}

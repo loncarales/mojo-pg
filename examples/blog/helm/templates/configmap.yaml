@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "mojo-blog.name" . }}-configuration
+  labels:
+    app: {{ template "mojo-blog.name" . }}
+    chart: {{ template "mojo-blog.chart" . }}
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+data:
+  blog.conf: |
+    {
+      pg      => 'postgresql://{{ .Values.environmentVars.dbUserName }}:{{ .Values.environmentVars.dbPassword }}@db-{{ include "mojo-blog.fullname" . }}:5432/{{ .Values.environmentVars.dbDatabase }}',
+      secrets => ['s3cret']
+    }

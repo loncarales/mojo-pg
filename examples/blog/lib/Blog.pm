@@ -8,7 +8,7 @@ sub startup {
   my $self = shift;
 
   # Configuration
-  $self->plugin('Config');
+  $self->plugin('Config' => {file => 'etc/blog.conf'});
   $self->secrets($self->config('secrets'));
 
   # Model

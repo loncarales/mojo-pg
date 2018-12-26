@@ -1,0 +1,10 @@
+.gitignore
+*.md
+*.yml
+Jenkinsfile.groovy
+VERSION
+.git/
+etc/blog.conf
+helm/
+local/
+t/

@@ -1,0 +1,60 @@
+image: docker:stable
+
+services:
+  - docker:dind
+
+variables:
+  CONTAINER_REGISTRY: "registry.gitlab.com"
+  DOCKER_IMAGE: "loncarales/mojo-blog"
+
+before_script:
+  - 'docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CONTAINER_REGISTRY'
+
+stages:
+  - build
+  - test
+  - release
+  - deploy
+
+build:
+  stage: build
+  tags:
+    - docker
+  script:
+    - 'docker build -t $CONTAINER_REGISTRY/$DOCKER_IMAGE:build .'
+    - 'docker push $CONTAINER_REGISTRY/$DOCKER_IMAGE:build'
+  only:
+    - master
+
+test:
+  stage: test
+  tags:
+    - docker
+  script:
+    - 'docker pull $CONTAINER_REGISTRY/$DOCKER_IMAGE:build'
+    - 'docker run --rm -v $PWD/t:/opt/app/t $CONTAINER_REGISTRY/$DOCKER_IMAGE:build carton exec prove -lr -j4'
+  only:
+    - master
+
+release:
+  stage: release
+  tags:
+    - docker
+  script:
+    - 'docker pull $CONTAINER_REGISTRY/$DOCKER_IMAGE:build'
+    - 'VERSION=$(cat VERSION)'
+    - 'docker tag $CONTAINER_REGISTRY/$DOCKER_IMAGE:build $CONTAINER_REGISTRY/$DOCKER_IMAGE:v$VERSION'
+    - 'docker push $CONTAINER_REGISTRY/$DOCKER_IMAGE:v$VERSION'
+    - 'docker tag $CONTAINER_REGISTRY/$DOCKER_IMAGE:v$VERSION $CONTAINER_REGISTRY/$DOCKER_IMAGE:latest'
+    - 'docker push $CONTAINER_REGISTRY/$DOCKER_IMAGE:latest'
+  only:
+    - master
+
+deploy:
+  stage: deploy
+  tags:
+    - docker
+  script:
+    - 'echo TBA'
+  only:
+    - master

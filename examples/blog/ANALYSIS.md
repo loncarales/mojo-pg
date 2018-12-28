@@ -37,3 +37,7 @@ To keep it clear and straightforward semantic versioning is used which is also u
 Example: 20170717.111749-master-1.2.3
 
 Additional tagging should also be applied after successful rollouts to INT / PROD in GIT.
+
+## Hypnotoad Prefork Web Server
+
+Mojo::Server::Hypnotoad is a built-in prefork web server in production environment. hypnotoad is command line interface to run Mojolicious application. Server start on port 8080 by default which is also port exposed in Docker image. In production generally reverse proxy server (Nginx, Apache) is used to access hypnotoad server.

@@ -38,6 +38,12 @@ $ docker run --rm -v $PWD/t:/opt/app/t <IMAGE> carton exec prove -lr -j4
 
 ## Working with Helm
 
+### Install `tiller` in the Minikube cluster
+
+```bash
+$ helm init
+```
+
 ### We can do a dry-run of a helm install and enable debug to inspect the generated definitions:
 
 ```bash
@@ -66,6 +72,12 @@ $ helm del --purge mojo-blog
 
 ```bash
 $ helm lint ./helm
+```
+
+### Render chart templates locally and store them as Kubernetes YAML
+
+```bash
+$ helm template --name mojo-blog --namespace=default ./helm  > mojo-blog.yaml
 ```
 
 ## Use Port Forwarding to Access Applications in a Cluster

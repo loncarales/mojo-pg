@@ -7,10 +7,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Build the Docker image
+      - name: Login to Docker Registry
         run: docker login docker.pkg.github.com --username ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.GITHUB_TOKEN }}
+      - name: Build Docker image
         run: docker build --file ./examples/blog/Dockerfile --tag mojo-blog:build ./examples/blog
+      - name: Tag Docker Image
         run: docker tag mojo-blog:build docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build
+      - name: Push Docker Image to Registry
         run: docker push docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build
 
   test:
@@ -18,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Run tests inside the Docker container
+      - name: Pull Docker Image from Registry
         run: docker pull docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build
+      - name: Run tests inside the Docker container
         run: docker run --rm -v ./examples/blog/t:/opt/app/t docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build carton exec prove -lr -j4

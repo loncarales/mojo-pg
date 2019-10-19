@@ -1,5 +1,6 @@
 .*
 *~
+!.github
 !.gitignore
 !.appveyor.cmd
 !.appveyor.yml

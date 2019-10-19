@@ -5,8 +5,14 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v1
       - name: Build the Docker image
-        run: docker build --file ./examples/blog/Dockerfile --tag mojo-blog:$(date +%s) ./examples/blog
+        run: docker build --file ./examples/blog/Dockerfile --tag mojo-blog:latest ./examples/blog
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Run tests inside the Docker container
+        run: docker run --rm -v ./examples/blog/t:/opt/app/t mojo-blog:latest carton exec prove -lr -j4

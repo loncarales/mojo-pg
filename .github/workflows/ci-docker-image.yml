@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Login to Docker Registry
-        run: docker login docker.pkg.github.com --username ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.GITHUB_TOKEN }}
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${{ secrets.REGISTRY_USERNAME }} --password-stdin
       - name: Build Docker image
         run: docker build --file ./examples/blog/Dockerfile --tag mojo-blog:build ./examples/blog
       - name: Tag Docker Image
@@ -21,6 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - name: Login to Docker Registry
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${{ secrets.REGISTRY_USERNAME }} --password-stdin
       - name: Pull Docker Image from Registry
         run: docker pull docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build
       - name: Run tests inside the Docker container

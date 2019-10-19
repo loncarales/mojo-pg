@@ -37,9 +37,9 @@ jobs:
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${{ secrets.REGISTRY_USERNAME }} --password-stdin
       - name: Pull Docker Image from Registry
         run: docker pull docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build
-      - name: Get the VERSION
+      - shell: bash
         run: VERSION=$(cat examples/blog/VERSION)
       - name: Tag Docker Images
         run: docker tag docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:latest && docker tag docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:v$VERSION
       - name: Push Taged Docker Image to Registry
-        run: docker push docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:latest && docker push docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:v$VERSION
+        run: docker push docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:v$VERSION && docker push docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:latest

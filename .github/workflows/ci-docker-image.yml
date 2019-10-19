@@ -26,4 +26,4 @@ jobs:
       - name: Pull Docker Image from Registry
         run: docker pull docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build
       - name: Run tests inside the Docker container
-        run: docker run --rm -v ./examples/blog/t:/opt/app/t docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build carton exec prove -lr -j4
+        run: docker run --rm -v $PWD/examples/blog/t:/opt/app/t docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build carton exec prove -lr -j4

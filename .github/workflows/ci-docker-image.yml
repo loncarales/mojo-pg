@@ -8,7 +8,10 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Build the Docker image
-        run: docker build --file ./examples/blog/Dockerfile --tag mojo-blog:latest ./examples/blog
+        run: docker login docker.pkg.github.com --username ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.GITHUB_TOKEN }}
+        run: docker build --file ./examples/blog/Dockerfile --tag mojo-blog:build ./examples/blog
+        run: docker tag mojo-blog:build docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build
+        run: docker push docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build
 
   test:
     needs: build
@@ -16,4 +19,5 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Run tests inside the Docker container
-        run: docker run --rm -v ./examples/blog/t:/opt/app/t mojo-blog:latest carton exec prove -lr -j4
+        run: docker pull docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build
+        run: docker run --rm -v ./examples/blog/t:/opt/app/t docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build carton exec prove -lr -j4

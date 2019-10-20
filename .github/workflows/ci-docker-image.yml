@@ -3,8 +3,7 @@ name: CI - Docker Image
 on: [push]
 
 jobs:
-  push:
-    needs: test
+  environment:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1

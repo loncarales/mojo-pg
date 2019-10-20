@@ -3,28 +3,6 @@ name: CI - Docker Image
 on: [push]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: Build Docker Image
-        run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${{ secrets.REGISTRY_USERNAME }} --password-stdin
-          docker build --file ./examples/blog/Dockerfile --tag mojo-blog:build ./examples/blog
-          docker tag mojo-blog:build docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build
-          docker push docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build
-
-  test:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: Run tests inside the Docker container
-        run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${{ secrets.REGISTRY_USERNAME }} --password-stdin
-          docker pull docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build
-          docker run --rm -v $PWD/examples/blog/t:/opt/app/t docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build carton exec prove -lr -j4
-
   push:
     needs: test
     runs-on: ubuntu-latest
@@ -32,11 +10,41 @@ jobs:
       - uses: actions/checkout@v1
       - name: Push Taged Docker Image to Registry
         run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${{ secrets.REGISTRY_USERNAME }} --password-stdin
-          docker pull docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build
-          docker tag docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:latest
-          docker tag docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:v${VERSION}
-          docker push docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:v${VERSION}
-          docker push docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:latest
+          echo ${VERSION}
         env:
           VERSION: $(cat examples/blog/VERSION)
+  # build:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v1
+  #     - name: Build Docker Image
+  #       run: |
+  #         echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${{ secrets.REGISTRY_USERNAME }} --password-stdin
+  #         docker build --file ./examples/blog/Dockerfile --tag mojo-blog:build ./examples/blog
+  #         docker tag mojo-blog:build docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build
+  #         docker push docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build
+  # test:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v1
+  #     - name: Run tests inside the Docker container
+  #       run: |
+  #         echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${{ secrets.REGISTRY_USERNAME }} --password-stdin
+  #         docker pull docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build
+  #         docker run --rm -v $PWD/examples/blog/t:/opt/app/t docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build carton exec prove -lr -j4
+  # push:
+  #   needs: test
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v1
+  #     - name: Push Taged Docker Image to Registry
+  #       run: |
+  #         echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${{ secrets.REGISTRY_USERNAME }} --password-stdin
+  #         docker pull docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build
+  #         docker tag docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:latest
+  #         docker tag docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:build docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:v${VERSION}
+  #         docker push docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:v${VERSION}
+  #         docker push docker.pkg.github.com/${{ secrets.REGISTRY_USERNAME }}/mojo-pg/mojo-blog:latest
+  #       env:
+  #         VERSION: $(cat examples/blog/VERSION)
